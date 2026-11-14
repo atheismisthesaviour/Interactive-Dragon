@@ -16,6 +16,8 @@ APP_NAME = "BrandGuard AI"
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./brandguard.db")
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+if DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -117,7 +119,9 @@ def brand_or_404(s, brand_id):
 
 def reviewer_guard(x_reviewer_key: Optional[str] = Header(default=None)):
     expected = os.getenv("REVIEWER_API_KEY")
-    if expected and x_reviewer_key != expected:
+    if not expected:
+        raise HTTPException(503, "Reviewer authorization is not configured")
+    if x_reviewer_key != expected:
         raise HTTPException(403, "Reviewer authorization required")
     return True
 
