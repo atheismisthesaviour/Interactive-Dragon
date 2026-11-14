@@ -5,6 +5,7 @@ from pathlib import Path
 
 import httpx
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Header
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, ForeignKey
@@ -206,7 +207,7 @@ class ActionIn(BaseModel):
 
 @app.get("/")
 def root():
-    return {"name":APP_NAME,"status":"running","docs":"/docs","health":"/health","disclaimer":"AI findings are advisory. Human review is required before publication."}
+    return FileResponse("static/index.html", media_type="text/html")
 @app.get("/health")
 def health(): return {"status":"ok","service":"brandguard-api","timestamp":now().isoformat()}
 @app.get("/api")
