@@ -141,7 +141,7 @@ def deterministic_review(s, brand_id, content):
         # Rules can contain explicit forbidden phrase: "Avoid: phrase"
         m = re.search(r"(?:avoid|do not use|never say)\s*:\s*['\"]?(.+?)['\"]?$", g.rule, re.I)
         if m and m.group(1).strip().lower() in lower:
-            phrase = m.group(1).strip().strip("'\\"")
+            phrase = m.group(1).strip().strip("'").strip('"')
             out.append(finding(g.category,g.severity,f"Content conflicts with guideline: {g.title}",phrase,f"Remove or rewrite '{phrase}' while preserving the intended message.",g.title))
     promotional = re.findall(r"\b(best|#1|number one|guaranteed|100%|world's leading|the only)\b", content, re.I)
     for phrase in sorted(set(promotional), key=str.lower):
